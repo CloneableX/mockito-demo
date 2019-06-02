@@ -6,6 +6,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.mockito.stubbing.OngoingStubbing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,5 +45,34 @@ public class StubDemo {
 
         mockedList.add(0, "123");
         mockedList.clear();
+    }
+
+    @Test
+    public void stubMultipleResult() {
+        when(mockedList.get(anyInt())).thenReturn("first get").thenReturn("more than once get");
+
+        System.out.println(mockedList.get(0));
+        System.out.println(mockedList.get(0));
+        System.out.println(mockedList.get(0));
+
+        when(mockedList.remove(anyInt())).thenReturn("first remove", "twice remove", "more than twice remove");
+
+        System.out.println(mockedList.remove(0));
+        System.out.println(mockedList.remove(0));
+        System.out.println(mockedList.remove(0));
+        System.out.println(mockedList.remove(0));
+    }
+
+    @Test
+    public void stubCallback() {
+        when(mockedList.set(anyInt(), any())).thenAnswer(new Answer<Object>() {
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Object[] args = invocationOnMock.getArguments();
+                Object mocked = invocationOnMock.getMock();
+                return "arguments are: " + args;
+            }
+        });
+
+        System.out.println(mockedList.set(1, "Answer callback"));
     }
 }
